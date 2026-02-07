@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tracker</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <a href="/" class="back-link">Back</a>
+      <h1>Tracker</h1>
+      <p>View status for all users.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <script>
+      async function load() {
+        const res = await fetch("/api/progress");
+        const data = await res.json();
+        const tbody = document.getElementById("tbody");
+        const names = Object.keys(data);
+
+        if (names.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2">No users yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = names
+          .map((name) => {
+            const viewed = data[name];
+            const badgeClass = viewed ? "badge yes" : "badge no";
+            const label = viewed ? "Viewed" : "Not viewed";
+            return `<tr><td>${name}</td><td><span class="${badgeClass}">${label}</span></td></tr>`;
+          })
+          .join("");
+      }
+      load();
+    </script>
+  </body>
+</html>

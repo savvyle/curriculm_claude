@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Progress</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <a href="/" class="back-link">Back</a>
+      <h1>My Progress</h1>
+      <div id="info">Loading...</div>
+      <table id="table" style="display: none">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <script>
+      async function load() {
+        const name = sessionStorage.getItem("userName");
+        if (!name) {
+          document.getElementById("info").textContent = "Please sign in first.";
+          return;
+        }
+
+        const res = await fetch(
+          `/api/progress/user?name=${encodeURIComponent(name)}`
+        );
+        const data = await res.json();
+
+        document.getElementById("info").style.display = "none";
+        const table = document.getElementById("table");
+        table.style.display = "table";
+
+        const viewed = data.viewed;
+        const badgeClass = viewed ? "badge yes" : "badge no";
+        const label = viewed ? "Viewed" : "Not viewed";
+        document.getElementById(
+          "tbody"
+        ).innerHTML = `<tr><td>${data.name}</td><td><span class="${badgeClass}">${label}</span></td></tr>`;
+      }
+      load();
+    </script>
+  </body>
+</html>

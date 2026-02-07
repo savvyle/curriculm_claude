@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curriculum Maker</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">Back</a>
+    <h1>Curriculum Maker</h1>
+    <textarea id="editor" placeholder="Write your curriculum here..."></textarea>
+    <button id="saveBtn" style="margin-top:12px;margin-left:0;">Save</button>
+    <div id="status" class="status" style="display:none;"></div>
+  </div>
+  <script>
+    const editor = document.getElementById('editor');
+    const saveBtn = document.getElementById('saveBtn');
+    const status = document.getElementById('status');
+
+    async function load() {
+      const res = await fetch('/api/curriculum');
+      const data = await res.json();
+      editor.value = data.content;
+    }
+
+    saveBtn.addEventListener('click', async () => {
+      const res = await fetch('/api/curriculum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: editor.value })
+      });
+      if (res.ok) {
+        status.textContent = 'Saved successfully.';
+        status.className = 'status success';
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 2000);
+      }
+    });
+
+    load();
+  </script>
+</body>
+</html>
