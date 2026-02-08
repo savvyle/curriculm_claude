@@ -12,37 +12,27 @@
       <h1>Tracker</h1>
       <p>View status for all users.</p>
       <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Name</th><th>Status</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
+    <script src="/shared.js"></script>
     <script>
-      async function load() {
-        const res = await fetch("/api/progress");
-        const data = await res.json();
-        const tbody = document.getElementById("tbody");
+      (async () => {
+        const data = await api("GET", "/api/progress");
         const names = Object.keys(data);
+        const tbody = document.getElementById("tbody");
 
-        if (names.length === 0) {
+        if (!names.length) {
           tbody.innerHTML = '<tr><td colspan="2">No users yet.</td></tr>';
           return;
         }
 
-        tbody.innerHTML = names
-          .map((name) => {
-            const viewed = data[name];
-            const badgeClass = viewed ? "badge yes" : "badge no";
-            const label = viewed ? "Viewed" : "Not viewed";
-            return `<tr><td>${name}</td><td><span class="${badgeClass}">${label}</span></td></tr>`;
-          })
-          .join("");
-      }
-      load();
+        tbody.innerHTML = names.map((name) => {
+          const viewed = data[name];
+          return `<tr><td>${name}</td><td><span class="badge ${viewed ? "yes" : "no"}">${viewed ? "Viewed" : "Not viewed"}</span></td></tr>`;
+        }).join("");
+      })();
     </script>
   </body>
 </html>

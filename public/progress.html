@@ -12,40 +12,27 @@
       <h1>My Progress</h1>
       <div id="info">Loading...</div>
       <table id="table" style="display: none">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Name</th><th>Status</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
+    <script src="/shared.js"></script>
     <script>
-      async function load() {
-        const name = sessionStorage.getItem("userName");
+      (async () => {
+        const name = getUser();
         if (!name) {
           document.getElementById("info").textContent = "Please sign in first.";
           return;
         }
 
-        const res = await fetch(
-          `/api/progress/user?name=${encodeURIComponent(name)}`
-        );
-        const data = await res.json();
-
+        const data = await api("GET", `/api/progress/user?name=${encodeURIComponent(name)}`);
         document.getElementById("info").style.display = "none";
-        const table = document.getElementById("table");
-        table.style.display = "table";
+        document.getElementById("table").style.display = "table";
 
         const viewed = data.viewed;
-        const badgeClass = viewed ? "badge yes" : "badge no";
-        const label = viewed ? "Viewed" : "Not viewed";
-        document.getElementById(
-          "tbody"
-        ).innerHTML = `<tr><td>${data.name}</td><td><span class="${badgeClass}">${label}</span></td></tr>`;
-      }
-      load();
+        document.getElementById("tbody").innerHTML =
+          `<tr><td>${data.name}</td><td><span class="badge ${viewed ? "yes" : "no"}">${viewed ? "Viewed" : "Not viewed"}</span></td></tr>`;
+      })();
     </script>
   </body>
 </html>

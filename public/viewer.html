@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Curriculum</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <a href="/" class="back-link">Back</a>
+      <h1>Curriculum</h1>
+      <div id="content" class="curriculum-content">Loading...</div>
+    </div>
+    <script src="/shared.js"></script>
+    <script>
+      (async () => {
+        const data = await api("GET", "/api/curriculum");
+        document.getElementById("content").textContent = data.content || "(No curriculum content yet.)";
+        const name = getUser();
+        if (name) await api("POST", "/api/track-view", { name });
+      })();
+    </script>
+  </body>
+</html>

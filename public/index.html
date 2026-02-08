@@ -3,66 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Curriculum - Sign In</title>
+    <title>CurricuLM</title>
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div class="container">
-      <h1>Curriculum App</h1>
+      <h1>CurricuLM</h1>
       <div class="form-row">
         <input type="text" id="nameInput" placeholder="Enter your name" />
-        <button id="submitBtn">Submit</button>
+        <button id="submitBtn">Sign In</button>
       </div>
       <div id="links" class="links" style="display: none"></div>
     </div>
+
+    <script src="/shared.js"></script>
+
     <script>
       const nameInput = document.getElementById("nameInput");
-      const submitBtn = document.getElementById("submitBtn");
       const linksDiv = document.getElementById("links");
 
-      submitBtn.addEventListener("click", signin);
+      document.getElementById("submitBtn").addEventListener("click", signin);
       nameInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter") signin();
       });
 
       async function signin() {
-        const name = nameInput.value.trim();
+        const name = nameInput.value.toLowerCase().trim();
         if (!name) return;
-
-        const res = await fetch("/api/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name }),
-        });
-        const data = await res.json();
-
+        const data = await api("POST", "/api/signin", { name });
         sessionStorage.setItem("userName", data.name);
         sessionStorage.setItem("isAdmin", data.isAdmin);
-
         showLinks(data.isAdmin);
       }
 
       function showLinks(isAdmin) {
-        let html = "";
-        if (isAdmin) {
-          html += `<a href="/maker.html">Curriculum Maker</a>`;
-          html += `<a href="/curriculum.html">Curriculum</a>`;
-          html += `<a href="/tracker.html">Tracker</a>`;
-          html += `<a href="/progress.html">My Progress</a>`;
-        } else {
-          html += `<a href="/curriculum.html">Curriculum</a>`;
-          html += `<a href="/progress.html">Progress</a>`;
-        }
-        linksDiv.innerHTML = html;
+        const pages = isAdmin
+          ? [
+              ["Curriculum Maker", "/maker.html"],
+              ["Curriculum", "/viewer.html"],
+              ["Tracker", "/tracker.html"],
+              ["My Progress", "/progress.html"],
+            ]
+          : [
+              ["Curriculum", "/viewer.html"],
+              ["Progress", "/progress.html"],
+            ];
+
+        linksDiv.innerHTML = pages
+          .map(([label, href]) => `<a href="${href}">${label}</a>`)
+          .join("");
         linksDiv.style.display = "block";
       }
 
-      // Restore session on page load (for "Back" navigation)
-      const savedName = sessionStorage.getItem("userName");
-      const savedAdmin = sessionStorage.getItem("isAdmin");
+      const savedName = getUser();
       if (savedName) {
         nameInput.value = savedName;
-        showLinks(savedAdmin === "true");
+        showLinks(sessionStorage.getItem("isAdmin") === "true");
       }
     </script>
   </body>
